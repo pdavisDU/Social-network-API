@@ -1,5 +1,5 @@
-const User = require('../model/User');
-const Thought = require('../model/Thought');
+const User = require('../models/User');
+const Thought = require('../models/Thought');
 
 //need to export our module
 
@@ -29,5 +29,48 @@ module.exports = {
             return res.status(400).json(err);
         })
     },
-    
-}
+         updateThought (req,res){
+             Thought.findOneAndUpdate(
+                 {_id:req.params.thoughtId}, {$set:req.body}, {new:true}
+             )
+                .then((thought)=> !thought ? res.status(400).json({message:'Not found'})
+                : res.json(thought)
+                )
+                .catch((err)=>{
+                    console.log(err);
+                    res.status(500).json(err);
+                });
+         },
+
+         deleteThought(req,res){
+                Thought.findOneAndDelete({_id:req.params.thoughtId}).then((thought)=>{
+                    if(!thought){
+                        return res.status(404).json({message: 'Not found'})
+                    }
+                })
+                    .then(()=>{
+                        res.json({message: 'Deleted'})
+                    })
+                    .catch((err)=>{
+                        console.log(err);
+                        res.status(500).json(err);
+                    });
+         },
+         addReaction(req,res){
+             console.log(req.body);
+             Thought.findOneAndUpdate({_id:req.params.thoughtId}, {$addToSet: {reactions:req.body}}, {new:true})
+             .then((thought)=>
+             !thought ? res.status(404).json({message:'Not found'}) : res.json(thought)
+             )
+             .catch ((err)=>{
+                 res.status(500).json(err);
+             });
+         },
+         deleteReaction(req,res){
+             Thought.findOneAndUpdate({_id: req.params.thoughtId}, {$pull:{reactions:{reactionId: req.params.reactionId}}}, {new:true})
+             .then((thought)=>
+             !thought ? res.status(404).json({message: 'Not found'}) : res.json(thought)
+             )
+             .catch ((err)=>res.status(500).json(err));
+         },
+};
