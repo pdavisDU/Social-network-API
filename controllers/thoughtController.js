@@ -7,7 +7,7 @@ module.exports = {
     //run your get for thoughts
 
         getThoughts(req,res){
-            Thought.find().then((thoughts)=> res.status(2002).json(thoughts)).catch((err)=> res.status(500).json(err));
+            Thought.find().then((thoughts)=> res.status(200).json(thoughts)).catch((err)=> res.status(500).json(err));
         },
         singleThought(req,res){
             //           make sure to use params
